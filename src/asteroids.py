@@ -273,13 +273,17 @@ class Asteroids():
 	#Pretty self-explanatory; if the input index is true, do that action.
         input_array = AI.sendInput()  
 	if input_array[0]:
+		self.ship.increaseThrust()
 		self.ship.thrustJet.accelerating = True
-	if not input_array[0]:
-		self.ship.thrustJet.accelerating = False
+ 	if not input_array[0]:
+	 	self.ship.thrustJet.accelerating = False
    	if input_array[1]:
 		self.ship.rotateLeft()
 	if input_array[2]:
-		self.ship.rotateRight() 
+		self.ship.rotateRight()
+	if input_array[3]:
+		self.ship.fireBullet()
+		 
     # Check for ship hitting the rocks etc.
     def checkCollisions(self):
             
