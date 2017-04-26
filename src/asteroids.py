@@ -27,6 +27,7 @@
 # o for frame advance whilst paused
 
 import pygame, sys, os, random
+import numpy as np
 from pygame.locals import *  
 from util.vectorsprites import *
 from ship import *
@@ -34,7 +35,7 @@ from stage import *
 from badies import *
 from shooter import *
 from soundManager import *
-        
+from ai import *
 class Asteroids():
         
     explodingTtl = 180
@@ -255,7 +256,7 @@ class Asteroids():
                    self.frameAdvance = True                   
                 
     def processKeys(self):
-        '''
+        ''' Commented Out Original Author's Code
         key = pygame.key.get_pressed()
      
         if key[K_LEFT] or key[K_z]:
@@ -269,8 +270,16 @@ class Asteroids():
         else:
             self.ship.thrustJet.accelerating = False
         '''               
-        self.ship.rotateLeft()
-    
+	#Pretty self-explanatory; if the input index is true, do that action.
+        input_array = AI.sendInput()  
+	if input_array[0]:
+		self.ship.thrustJet.accelerating = True
+	if not input_array[0]:
+		self.ship.thrustJet.accelerating = False
+   	if input_array[1]:
+		self.ship.rotateLeft()
+	if input_array[2]:
+		self.ship.rotateRight() 
     # Check for ship hitting the rocks etc.
     def checkCollisions(self):
             
@@ -395,6 +404,7 @@ if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled' 
 
 initSoundManager()
+AI = AI()
 game = Asteroids()
 game.playGame()
 
