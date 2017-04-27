@@ -1,5 +1,5 @@
 import numpy as np
-
+from asteroids import *
 # Machine Learning AI for Asteroids
 # This AI is designed to work with a modified version of Pythonic Asteroids (see "original readme.txt")
 # by Kaleb Ruscitti (kaleb.ruscitti.ca) 
@@ -39,6 +39,4 @@ class AI():
 			n += 1
 			print(value) 
 		return self.input_array	
-
-ai = AI()
-print(ai.sendInput())	
+	

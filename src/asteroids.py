@@ -111,7 +111,7 @@ class Asteroids():
         while True: 
           
             # fps
-            timePassed += clock.tick(60)            
+            timePassed += clock.tick(60) 
             frameCount += 1            
             if frameCount % 10 == 0:
                 self.fps = (frameCount / (timePassed / 1000.0))
@@ -149,7 +149,7 @@ class Asteroids():
         if self.lives == 0:
             self.gameState = 'attract_mode'
         else:
-            self.processKeys()
+            self.interfaceWithAI()
             self.checkCollisions()                                
             if len(self.rockList) == 0:
                 self.levelUp()
@@ -210,7 +210,7 @@ class Asteroids():
         scoreText = font2.render(scoreStr, True, (255, 255, 255))
         scoreTextRect = scoreText.get_rect(centerx=40, centery=15)
         self.stage.screen.blit(scoreText, scoreTextRect)                    
-        
+       
     def displayPaused(self):        
         if self.paused:
             font2 = pygame.font.Font(None, 30)                    
@@ -227,15 +227,8 @@ class Asteroids():
                 sys.exit(0) 
             elif event.type == KEYDOWN:                
                 if event.key == K_ESCAPE:
-                    sys.exit(0)
-                if self.gameState == 'playing':
-                    if event.key == K_SPACE:
-                        self.ship.fireBullet()
-                    elif  event.key == K_b: 
-                        self.ship.fireBullet()
-                    elif event.key == K_h:
-                        self.ship.enterHyperSpace()
-                elif self.gameState == 'attract_mode':
+                    sys.exit(0)  
+                if self.gameState == 'attract_mode':
                     # Start a new game
                     if event.key == K_RETURN:                                                
                         self.initialiseGame()                
@@ -255,22 +248,17 @@ class Asteroids():
                if event.key == K_o:
                    self.frameAdvance = True                   
                 
-    def processKeys(self):
-        ''' Commented Out Original Author's Code
-        key = pygame.key.get_pressed()
-     
-        if key[K_LEFT] or key[K_z]:
-            self.ship.rotateLeft()
-        elif key[K_RIGHT] or key[K_x]:
-            self.ship.rotateRight()
-        
-        if key[K_UP] or key[K_n]:
-            self.ship.increaseThrust()
-            self.ship.thrustJet.accelerating = True
-        else:
-            self.ship.thrustJet.accelerating = False
-        '''               
-	#Pretty self-explanatory; if the input index is true, do that action.
+    def interfaceWithAI(self):     
+
+	#generate information to allow the AI to "see" the screen
+	baddie_array = np.empty([0,2])	
+	for rock in self.rockList:
+		x = rock.position.x
+		y = rock.position.y
+		position = np.array([[x,y]])
+		baddie_array = np.append(baddie_array, position, axis=0)
+	
+	#Pretty self-explanatory; if the input index is true, do that action. 
         input_array = AI.sendInput()  
 	if input_array[0]:
 		self.ship.increaseThrust()
@@ -283,6 +271,7 @@ class Asteroids():
 		self.ship.rotateRight()
 	if input_array[3]:
 		self.ship.fireBullet()
+
 		 
     # Check for ship hitting the rocks etc.
     def checkCollisions(self):
