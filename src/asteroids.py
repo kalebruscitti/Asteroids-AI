@@ -58,7 +58,7 @@ class Asteroids():
         [self.stage.removeSprite(sprite) for sprite in self.rockList] # clear old rocks
         if self.saucer is not None: 
             self.killSaucer()
-        self.startLives = 3
+        self.startLives = 1
         self.createNewShip()
         self.createLivesList()
         self.score = 0        
@@ -108,10 +108,11 @@ class Asteroids():
         timePassed = 0.0      
         self.fps = 0.0                  
         # Main loop                
-        while True: 
+        self.running = True
+        while self.running: 
           
             # fps
-            timePassed += clock.tick(60) 
+            timePassed += clock.tick(1) 
             frameCount += 1            
             if frameCount % 10 == 0:
                 self.fps = (frameCount / (timePassed / 1000.0))
@@ -141,12 +142,14 @@ class Asteroids():
                 self.exploding()
             else:
                 self.displayText()                    
-                                    
+                self.initialiseGame()                   
             # Double buffer draw
             pygame.display.flip()     
                                                
+
     def playing(self):
         if self.lives == 0:
+            self.running = False
             self.gameState = 'attract_mode'
         else:
             self.interfaceWithAI()
@@ -192,7 +195,7 @@ class Asteroids():
         titleTextRect = titleText.get_rect(centerx=self.stage.width/2)        
         titleTextRect.y = self.stage.height/2 - titleTextRect.height*2
         self.stage.screen.blit(titleText, titleTextRect)
-                    
+                   
         font2 = pygame.font.Font(None, 30)                    
         keysText = font2.render('Z left, X right, B fire, N thrust, H hyperspace, Esc to quit', True, (255, 255, 255))
         keysTextRect = keysText.get_rect(centerx=self.stage.width/2)        
@@ -203,6 +206,10 @@ class Asteroids():
         instructionTextRect = instructionText.get_rect(centerx=self.stage.width/2)        
         instructionTextRect.y = self.stage.height/2 + instructionTextRect.height
         self.stage.screen.blit(instructionText, instructionTextRect)
+ 
+    def sendScore(self):
+        print("Sending Score")
+        return self.score
                   
     def displayScore(self):
         font2 = pygame.font.Font(None, 30)
@@ -251,15 +258,15 @@ class Asteroids():
     def interfaceWithAI(self):     
 
 	#generate information to allow the AI to "see" the screen
-	baddie_array = np.empty([0,2])	
+	self.baddie_array = np.empty([0,2])	
 	for rock in self.rockList:
 		x = rock.position.x
 		y = rock.position.y
 		position = np.array([[x,y]])
-		baddie_array = np.append(baddie_array, position, axis=0)
+		self.baddie_array = np.append(self.baddie_array, position, axis=0)
 	
 	#Pretty self-explanatory; if the input index is true, do that action. 
-        input_array = AI.sendInput()  
+        input_array = AI.sendInput(self.baddie_array)  
 	if input_array[0]:
 		self.ship.increaseThrust()
 		self.ship.thrustJet.accelerating = True
@@ -272,7 +279,9 @@ class Asteroids():
 	if input_array[3]:
 		self.ship.fireBullet()
 
-		 
+    def sendScore(self):
+        return self.score
+
     # Check for ship hitting the rocks etc.
     def checkCollisions(self):
             
@@ -399,6 +408,5 @@ if not pygame.mixer: print 'Warning, sound disabled'
 initSoundManager()
 AI = AI()
 game = Asteroids()
-game.playGame()
 
 ####

@@ -30,7 +30,7 @@ class Ship(Shooter):
     acceleration = 0.2
     decelaration= -0.005
     maxVelocity = 10
-    turnAngle = 6
+    turnAngle = 0
     bulletVelocity = 13.0
     maxBullets = 4
     bulletTtl = 35

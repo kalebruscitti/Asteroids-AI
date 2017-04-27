@@ -20,23 +20,15 @@ class AI():
 	def turnRight(self):
 		self.input_array[2] = True
 	
-	def sendInput(self):
-		self.input_array = self.determineAction()
-		return self.input_array
-	
-	def determineAction(self):
+	def sendInput(self,baddie_array):
 		self.input_array = np.array([False,False,False,False,False])
 		#randomly generate 5 values
  		self.random_array = np.random.random_sample((5,))
 		#execute the actions statistically
 		n = 0
-		print(self.random_array)
-		print(self.p_array)
 		for value in self.p_array:
 			if value > self.random_array[n]:
 				self.input_array[n] = True
-				print("executing" + str(n))
-			n += 1
-			print(value) 
+			n += 1 
 		return self.input_array	
 	
