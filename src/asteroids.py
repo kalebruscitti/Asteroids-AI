@@ -268,7 +268,7 @@ class Asteroids():
         self.ship_pos = np.array([self.ship.position.x /self.stage.width, self.ship.position.y /self.stage.height])
 
     	#Pretty self-explanatory; if the input index is true, do that action.
-        input_array = AI.sendInput(self.baddie_array, self.ship.angle, self.ship_pos)
+        input_array = AI.sendInput(self.baddie_array, (self.ship.angle % 360)/360, self.ship_pos)
         if input_array[0]:
     		self.ship.increaseThrust()
     		self.ship.thrustJet.accelerating = True
