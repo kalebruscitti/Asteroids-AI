@@ -6,18 +6,17 @@ from soundManager import *
 trials = 2
 
 class Brain():
-	
+
 	def __init__(self):
 		self.score_array = np.empty([0,1])
 
 	def runAI(self):
-		
+
 		initSoundManager()
 		game = Asteroids()
 		game.playGame()
 		score = game.sendScore()
 		self.score_array = np.append(self.score_array, score)
-
 
 AI = AI()
 Brain = Brain()
