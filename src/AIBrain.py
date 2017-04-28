@@ -24,3 +24,4 @@ for i in range(trials):
 	Brain.runAI()
 
 print(Brain.score_array)
+#test
