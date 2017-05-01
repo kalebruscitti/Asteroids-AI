@@ -112,7 +112,7 @@ class Asteroids():
         while self.running:
 
             # fps
-            timePassed += clock.tick(60)
+            timePassed += clock.tick(6000)
             frameCount += 1
             if frameCount % 10 == 0:
                 self.fps = (frameCount / (timePassed / 1000.0))

@@ -38,10 +38,26 @@ class AI():
 
     def generateNeurons(self):
         self.Neuron_array = np.empty([0,1])
+        self.bias_array = np.empty([0,1])
         #neuron array allows us to iterate over them easily
         for n in range(self.neurons):
             neuron = Neuron()
             self.Neuron_array = np.append(self.Neuron_array, neuron)
+            self.bias_array = np.append(self.bias_array, neuron.bias)
+
+    def sendBias(self):
+        #save array, send and delete it
+        send_bias_array = self.bias_array
+        self.bias_array = np.empty([0,1])
+        return send_bias_array
+
+    def reinit(self):
+        #bool array where each index corresponds to a possible action.
+        self.input_array = np.array([False,False,False,False,False])
+        for neuron in self.Neuron_array:
+            adj = np.random.rand(1,)
+            neuron.adjust(adj)
+            self.bias_array = np.append(self.bias_array, neuron.bias)
 
 class Neuron(): #sigmoid neuron
     def __init__(self):
@@ -49,7 +65,7 @@ class Neuron(): #sigmoid neuron
         self.angle_weights = np.random.rand()
         self.pos_weights = np.random.rand(1,2)
         self.baddie_weights = np.random.rand(2,)
-        self.bias = 0.75
+        self.bias = np.random.rand(1,)
 
     def sigmoid(self, x):
         return 1/(1 + np.exp(x)) #sigma(x) where x = (w dot I - b)
@@ -65,4 +81,8 @@ class Neuron(): #sigmoid neuron
             self.x += np.dot(rock, self.baddie_weights)
         self.x -= self.bias
         self.x *= -1
+        #x is the "weighted input"
         return self.sigmoid(self.x)
+
+    def adjust(self, adj):
+        self.bias += adj
