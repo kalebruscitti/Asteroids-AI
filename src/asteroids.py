@@ -138,6 +138,7 @@ class Asteroids():
             # Process keys
             if self.gameState == 'playing':
                 self.playing()
+                self.score += 0.1
             elif self.gameState == 'exploding':
                 self.exploding()
             else:
@@ -208,8 +209,11 @@ class Asteroids():
         self.stage.screen.blit(instructionText, instructionTextRect)
 
     def sendScore(self):
-        print("Sending Score")
         return self.score
+
+    def sendMemory(self):
+        a, b = AI.sendMemory()
+        return a, b
 
     def displayScore(self):
         font2 = pygame.font.Font(None, 30)
@@ -268,7 +272,7 @@ class Asteroids():
         self.ship_pos = np.array([self.ship.position.x /self.stage.width, self.ship.position.y /self.stage.height])
 
     	#Pretty self-explanatory; if the input index is true, do that action.
-        input_array = AI.sendInput(self.baddie_array, (self.ship.angle % 360)/360, self.ship_pos)
+        input_array = AI.sendInput(self.baddie_array, (self.ship.angle % 360)/360, self.ship_pos, self.score)
         if input_array[0]:
     		self.ship.increaseThrust()
     		self.ship.thrustJet.accelerating = True
