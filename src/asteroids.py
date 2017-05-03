@@ -40,7 +40,7 @@ class Asteroids():
 
     explodingTtl = 180
 
-    def __init__(self):
+    def __init__(self, genes):
         self.stage = Stage('Pythentic Asteroids')
         self.paused = False
         self.frameAdvance = False
@@ -52,6 +52,8 @@ class Asteroids():
         self.score = 0
         self.ship = None
         self.lives = 0
+        self.genes = genes
+        self.AI = AI(genes)
 
     def initialiseGame(self):
         self.gameState = 'playing'
@@ -211,8 +213,8 @@ class Asteroids():
     def sendScore(self):
         return self.score
 
-    def sendMemory(self):
-        a, b = AI.sendMemory()
+    def collectWnB(self):
+        a, b = self.AI.collectWnB()
         return a, b
 
     def displayScore(self):
@@ -272,7 +274,7 @@ class Asteroids():
         self.ship_pos = np.array([self.ship.position.x /self.stage.width, self.ship.position.y /self.stage.height])
 
     	#Pretty self-explanatory; if the input index is true, do that action.
-        input_array = AI.sendInput(self.baddie_array, (self.ship.angle % 360)/360, self.ship_pos, self.score)
+        input_array = self.AI.sendInput(self.baddie_array, (self.ship.angle % 360)/360, self.ship_pos, self.score)
         if input_array[0]:
     		self.ship.increaseThrust()
     		self.ship.thrustJet.accelerating = True
@@ -412,7 +414,5 @@ if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
 
 initSoundManager()
-AI = AI()
-game = Asteroids()
 
 ####

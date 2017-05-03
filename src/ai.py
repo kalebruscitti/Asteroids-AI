@@ -4,26 +4,24 @@ from asteroids import *
 # This AI is designed to work with a modified version of Pythonic Asteroids (see "original readme.txt") - Original Author: Nick Redshaw
 # by Kaleb Ruscitti (kaleb.ruscitti.ca) and Joshua Varga
 
-class AI():
-    def __init__(self):
-        #bool array where each index corresponds to a possible action.
-        self.input_array = np.array([False,False,False,False,False])
 
+class AI():
+    def __init__(self, genes):
+        #bool array where each index corresponds to a possible action.
+        self.input_array = np.array([False, False, False, False, False])
         #change this number to the number of neurons in the first layer
         #also go to the outputNeuron class and change the number there
-        self.neurons=8
-        self.output_layer = self.generateNeurons(5, False)
-        self.hidden_layer = self.generateNeurons(self.neurons, True)
-        self.current_score = 0
-        self.score_memory = np.empty([0,1])
-        self.input_memory = np.empty([0,5])
+        self.neurons = 8
+        self.output_layer = self.generateNeurons(5, False, genes)
+        self.hidden_layer = self.generateNeurons(self.neurons, True, genes)
+        self.genes = genes
 
     def sendInput(self, baddie_array, ship_angle, ship_position, score):
         #reset the inputs from the last cycle
-        self.input_array = np.array([False,False, False,False,False])
+        self.input_array = np.array([False, False, False, False, False])
         output_array = self.feedForward(baddie_array, ship_angle, ship_position)
-        final_array = np.empty([0,5])
-        n = 0 #counter
+        final_array = np.empty([0, 5])
+        n = 0  #counter
         left = 0
         for neuron in self.output_layer:
             out = neuron.output(output_array)
@@ -42,7 +40,6 @@ class AI():
                     self.input_array[n] = True
             n += 1
             final_array = np.append(final_array, out)
-        self.storeData(score, np.array([final_array]))
         return self.input_array
 
     def feedForward(self, baddie_array, ship_angle, ship_position):
@@ -52,25 +49,31 @@ class AI():
             output_array = np.array([np.append(output_array, out)])
         return output_array
 
-    def generateNeurons(self, neurons, hidden):
-        Neuron_array = np.empty([0,1])
+    def generateNeurons(self, neurons, hidden, genes):
+        Neuron_array = np.empty([0, 1])
         #neuron array allows us to iterate over them easily
         if hidden:
             for n in range(neurons):
-                neuron = hiddenNeuron()
+                neuron = hiddenNeuron(genes)
                 Neuron_array = np.append(Neuron_array, neuron)
         else:
             for n in range(neurons):
-                neuron = outputNeuron()
+                neuron = outputNeuron(genes)
                 Neuron_array = np.append(Neuron_array, neuron)
 
         return Neuron_array
 
-    def sendBias(self):
-        #save array, send and delete it
-        send_bias_array = self.bias_array
-        self.bias_array = np.empty([0,1])
-        return send_bias_array
+    def collectWnB(self):
+        '#h_biases for hidden neurons, o_biases for output neurons'
+        h_biases = np.empty([0, 1])
+        o_biases = np.empty([0, 1])
+        for neuron in self.hidden_layer:
+            bias = neuron.bias
+            h_biases = np.append(h_biases, bias)
+        for neuron in self.output_layer:
+            bias = neuron.bias
+            o_biases = np.append(o_biases, bias)
+        return o_biases, h_biases
 
     def reinit(self):
         #bool array where each index corresponds to a possible action.
@@ -81,23 +84,22 @@ class AI():
         for neuron in self.output_layer:
             adj = np.random.rand(1,)
             neuron.adjust(adj)
-            self.bias_array = np.append(self.bias_array, neuron.bias)
         #return memory to the Brain
 
-    def storeData(self, score, input_array):
-        self.score_memory = np.append(self.score_memory, score)
-        self.input_memory = np.append(self.input_memory, input_array, 0)
 
-    def sendMemory(self):
-        return self.score_memory, self.input_memory
-
-class hiddenNeuron(): #sigmoid neuron
-    def __init__(self):
-        ##To do: recieve calculated inputs using gradient descent
-        self.angle_weights = np.random.rand()
-        self.pos_weights = np.random.rand(1,2)
-        self.baddie_weights = np.random.rand(2,)
-        self.bias = np.random.rand(1,)
+class hiddenNeuron():  #sigmoid neuron
+    def __init__(self, genes):
+        if genes == 0:
+            '#random initalization for the first generation'
+            self.angle_weights = np.random.rand()
+            self.pos_weights = np.random.rand(1,2)
+            self.baddie_weights = np.random.rand(2,)
+            self.bias = np.random.rand(1,)
+        else:
+            self.bias = genes[1]
+            self.angle_weights = np.random.rand()
+            self.pos_weights = np.random.rand(1,2)
+            self.baddie_weights = np.random.rand(2,)
 
     def sigmoid(self, x):
         return 1/(1 + np.exp(x)) #sigma(x) where x = (w dot I - b)
@@ -118,17 +120,20 @@ class hiddenNeuron(): #sigmoid neuron
         self.bias += adj
 
 class outputNeuron():
-    def __init__(self):
+    def __init__(self, genes):
         ##change this if you change AI.neurons above.
         self.inputs = 8
-        self.weights = np.random.rand(self.inputs,)
-        self.biases = np.random.rand(1,)
-
+        if genes == 0:
+            self.weights = np.random.rand(self.inputs,)
+            self.bias = np.random.rand(1,)
+        else:
+            self.bias = genes[0]
+            self.weights = np.random.rand(self.inputs,)
     def sigmoid(self, x):
         return 1/(1 + np.exp(x)) #sigma(x) where x = (w dot I - b)
 
     def output(self, inputs):
         z = np.dot(inputs, self.weights)
-        z -= self.biases
+        z -= self.bias
         z *= -1
         return self.sigmoid(z)
