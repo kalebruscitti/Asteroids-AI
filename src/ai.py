@@ -10,7 +10,7 @@ class AI():
         #bool array for each action
         self.p_array = np.random.random_sample((5,))
         #probability array for each action
-        self.neurons=5
+        self.neurons = 5
         #change this number to the number of neurons
         self.generateNeurons()
 
@@ -22,7 +22,7 @@ class AI():
         left = 0
         for neuron in self.Neuron_array:
             out = neuron.output(baddie_array, ship_angle, ship_position)
-            if out > 0.1:
+            if out > 0.4:
                 if n == 1:
                     left = out
                 if n == 2:
@@ -41,23 +41,31 @@ class AI():
             neuron = Neuron()
             self.Neuron_array = np.append(self.Neuron_array, neuron)
 
+    def sendWeights(self):
+        weights = np.empty([0,3])
+        for neuron in self.Neuron_array:
+            np.append(weights, neuron.weights_and_bias)
+        return weights
+
 class Neuron():
     def __init__(self):
-        self.angle_weights = np.random.rand() * 10
-        self.pos_weights = np.random.rand(1,2) * 10
-        self.baddie_weights = np.random.rand(1,2) * 10
+        self.angle_weights = np.random.rand()
+        self.pos_weights = np.random.rand(1, 2)
+        self.baddie_weights = np.random.rand(1, 3)
         self.bias = 0
+        self.weights_and_bias = np.array([self.angle_weights, self.pos_weights, self.baddie_weights, self.bias])
 
     def sigmoid(self, x):
-        return 1/(1 + np.exp(x))
-
+        return 1/(1 + np.exp(-x))
 
     def output(self, baddie_array, ship_angle, ship_position):
         x = 0
-        print(self.pos_weights)
-        x += np.dot(self.angle_weights,ship_angle)
+        print(str(self.pos_weights) + "_pos_")
+        x += np.dot(self.angle_weights, ship_angle)
         x += np.dot(self.pos_weights, ship_position)
-        print(self.sigmoid(x))
         x -= self.bias
+        print(str(x) + "_x_")
+        print(str(self.sigmoid(x)) + "_sigmoid_")
+
 
         return self.sigmoid(x)
